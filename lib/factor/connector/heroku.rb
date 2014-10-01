@@ -9,7 +9,6 @@ require 'zip'
 require 'zip/zip'
 require 'zip/zipfilesystem'
 require 'tmpdir'
-require 'oauth2'
 require 'open-uri'
 require 'tempfile'
 
