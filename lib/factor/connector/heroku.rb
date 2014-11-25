@@ -1,14 +1,5 @@
 require 'factor-connector-api'
-require 'json'
-require 'rest-client'
-require 'heroku-api'
-require 'anvil'
-require 'anvil/engine'
-require 'uri'
-require 'zip'
-require 'tmpdir'
-require 'open-uri'
-require 'tempfile'
+require 'platform-api'
 
 Factor::Connector.service 'heroku' do
   action 'deploy' do |params|
@@ -21,92 +12,40 @@ Factor::Connector.service 'heroku' do
     fail 'No app specified. Where am I supposed to deploy it?' unless app
     fail 'You need to activate Heroku on the services page' unless api_key
 
-    def release(api_key, app, description, slug_url)
-      payload = {
-        description: description,
-        slug_url: slug_url
-      }
+    heroku = PlatformAPI.connect_oauth(api_key)
 
-      options = {
-        'User-Agent'       => 'heroku-push-cli/0.7-ALPHA',
-        'X-Ruby-Version'   => RUBY_VERSION,
-        'X-Ruby-Platform'  => RUBY_PLATFORM,
-        :content_type => :json,
-        :accept => :json
-      }
-
-      release_uri = "https://:#{api_key}@cisaurus.heroku.com/v1/apps/#{app}/release"
-
-      response = RestClient.post release_uri, JSON.generate(payload), options
-      while response.code == 202
-        release_status_uri = "https://:#{api_key}@cisaurus.heroku.com/#{response.headers[:location]}"
-        response = RestClient.get release_status_uri, options
-        sleep(1)
-      end
-      JSON.parse response
-    end
-
-    info 'Getting the resource files from previous step'
+    info "Creating a build"
     begin
-      source = Tempfile.new('source')
-      source.write open(content).read
-      source.rewind
+      build = heroku.build.create(app, {source_blob:{url:content}})
     rescue => ex
-      fail 'Internal error: failed to get resource files', exception: ex
+      fail "Build failed: #{ex.message}"
     end
 
-    info 'Unzipping file'
+    build_id = build['id']
+    fail "Build failed: no build_id found" unless build_id
+
+    info "Waiting on build to complete"
     begin
-      temp_dir = Dir.mktmpdir
-      Zip::ZipFile.open(source) do |zip_file|
-        zip_file.each do |f|
-          f_path = File.join(temp_dir, f.name)
-          FileUtils.mkdir_p(File.dirname(f_path))
-          zip_file.extract(f, f_path) unless File.exist?(f_path)
-        end
-      end
-
-      if File.directory?(temp_dir)
-        dir_list = Dir.glob("#{temp_dir}/*")
-        temp_dir = dir_list[0] if dir_list.length == 1
-      end
-    rescue => ex
-      fail 'Unzip failed', exception: ex
-    end
-
-    info "Building the buildpack using Heroku's Anvil service"
-    begin
-      Anvil.append_agent '(heroku-push)'
-      Anvil.headers['X-Heroku-App']  = app
-
       begin
-        capture = StringIO.new
-        old_std = $stdout
-        $stdout = capture
-
-        slug_url = Anvil::Engine.build(temp_dir)
-        begin
-          $stdout.string.split("\n").each do |line|
-            info line
-          end
-        rescue
-          warn "Build completed but couldn't pull up results of build."
-        end
-      ensure
-        $stdout = old_std
-      end
+        build_info  = heroku.build.info(app,build_id)
+        sleep 1
+      end while build_info['status']=='pending'
     rescue => ex
-      fail 'Build failed', exception:ex
+      fail "Failed to get info while waiting: #{ex.message}"
     end
 
-    info 'Pushing buildpack to Heroku'
+    fail "Build completed with status '#{build_info['status']}'" unless build_info['status']=='succeeded'
+    slug_id = build_info['slug']['id'] if build_info['slug'] && build_info['slug']['id']
+
+    fail "Build completed, but couldn't identify slug_id" unless slug_id
+
+    info "Releasing code..."
     begin
-      release = release(api_key, app, "Pushed by #{user}", slug_url)
-      info "Release `#{release['release']}` complete"
-
-      action_callback release
+      release = heroku.release.create(app, slug:slug_id)
     rescue => ex
-      fail "Upload failed: #{ex.message}", exception: ex
+      fail "Failed to release the code: #{ex.message}"
     end
+
+    action_callback release
   end
 end
