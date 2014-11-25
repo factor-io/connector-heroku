@@ -3,7 +3,7 @@ $LOAD_PATH.push File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |s|
   s.name          = 'factor-connector-heroku'
-  s.version       = '0.0.7'
+  s.version       = '0.0.8'
   s.platform      = Gem::Platform::RUBY
   s.authors       = ['Maciej Skierkowski']
   s.email         = ['maciej@factor.io']
@@ -13,7 +13,6 @@ Gem::Specification.new do |s|
   
   s.require_paths = ['lib']
 
-  s.add_runtime_dependency 'rest-client', '~> 1.7.2'
-  s.add_runtime_dependency 'json', '1.8.1'
-  s.add_runtime_dependency 'factor-connector-api', '~> 0.0.3'
+  s.add_runtime_dependency 'platform-api', '~> 0.2.0'
+  s.add_runtime_dependency 'factor-connector-api', '~> 0.0.13'
 end
