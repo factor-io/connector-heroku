@@ -1,14 +1,6 @@
 require 'factor-connector-api'
 require 'json'
 require 'rest-client'
-require 'heroku-api'
-require 'anvil'
-require 'anvil/engine'
-require 'uri'
-require 'zip'
-require 'tmpdir'
-require 'open-uri'
-require 'tempfile'
 
 Factor::Connector.service 'heroku' do
   action 'deploy' do |params|

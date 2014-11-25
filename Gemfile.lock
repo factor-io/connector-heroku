@@ -1,41 +1,25 @@
 PATH
   remote: .
   specs:
-    factor-connector-heroku (0.0.4)
-      factor-connector-api (~> 0.0.3b)
-      heroku-anvil-factor (= 0.15.1)
-      heroku-api (= 0.3.19)
+    factor-connector-heroku (0.0.7)
+      factor-connector-api (~> 0.0.3)
       json (= 1.8.1)
       rest-client (~> 1.7.2)
-      rubyzip (~> 1.1.6)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.3.6)
     celluloid (0.16.0)
       timers (~> 4.0.0)
-    excon (0.39.6)
-    factor-connector-api (0.0.6)
-      addressable (~> 2.3.6)
+    factor-connector-api (0.0.13)
       celluloid (~> 0.16.0)
-      rest-client (~> 1.7.2)
-    heroku-anvil-factor (0.15.1)
-      progress (~> 2.4.0)
-      rest-client (~> 1.7.2)
-    heroku-api (0.3.19)
-      excon (~> 0.38)
-      multi_json (~> 1.8)
     hitimes (1.2.2)
     json (1.8.1)
-    mime-types (2.3)
-    multi_json (1.10.1)
-    netrc (0.7.7)
-    progress (2.4.0)
+    mime-types (2.4.3)
+    netrc (0.8.0)
     rest-client (1.7.2)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
-    rubyzip (1.1.6)
     timers (4.0.1)
       hitimes
 
