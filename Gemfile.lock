@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    factor-connector-heroku (0.0.8)
+    factor-connector-heroku (0.0.9)
       factor-connector-api (~> 0.0.14)
       platform-api (~> 0.2.0)
 
