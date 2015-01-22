@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_runtime_dependency 'platform-api', '~> 0.2.0'
-  s.add_runtime_dependency 'factor-connector-api', '~> 0.0.13'
+  s.add_runtime_dependency 'factor-connector-api', '~> 0.0.14'
 
   s.add_development_dependency 'codeclimate-test-reporter', '~> 0.4.5'
   s.add_development_dependency 'rspec', '~> 3.1.0'
