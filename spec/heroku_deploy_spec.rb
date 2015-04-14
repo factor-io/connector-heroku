@@ -1,7 +1,8 @@
 require 'spec_helper'
+require 'factor/connector/runtime'
 
-describe 'heroku' do
-  it ':: deploy' do
+describe HerokuConnectorDefinition do
+  it 'can deploy' do
     expect(true).to be(true)
   end
 end
