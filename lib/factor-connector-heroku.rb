@@ -1,12 +1,13 @@
-require 'factor-connector-api'
 require 'platform-api'
+require 'factor/connector/definition'
 
-Factor::Connector.service 'heroku' do
-  action 'deploy' do |params|
-    app      = params['app']
-    content  = params['content']
+class HerokuConnectorDefinition < Factor::Connector::Definition
+  id :github
+  action :deploy do |params|
+    app      = params[:app]
+    content  = params[:content]
     user     = 'factorbot'
-    api_key  = params['api_key']
+    api_key  = params[:api_key]
 
     fail 'No content specified. What am I supposed to deploy?' unless content
     fail 'No app specified. Where am I supposed to deploy it?' unless app
@@ -46,6 +47,6 @@ Factor::Connector.service 'heroku' do
       fail "Failed to release the code: #{ex.message}"
     end
 
-    action_callback release
+    respond release
   end
 end
